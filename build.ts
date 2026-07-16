@@ -6,7 +6,6 @@ await Bun.build({
     target: "node",
     format: "esm",
     splitting: false,
-    sourcemap: "external",
     minify: false,
     external: ["ky"],
     plugins: [dts()]
