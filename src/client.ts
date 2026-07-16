@@ -70,23 +70,6 @@ export interface BserClientOptions {
 }
 
 /**
- * ky 인스턴스 생성.
- * @param apiKey - API 키
- * @param timeout - 타임아웃 (ms)
- * @returns ky 인스턴스
- * @internal
- */
-function createKyInstance(apiKey: string, timeout: number): KyInstance {
-    return ky.create({
-        baseUrl: BASE_URL + "/",
-        timeout,
-        headers: {
-            "x-api-key": apiKey
-        }
-    });
-}
-
-/**
  * API HTTP 클라이언트 래퍼.
  * 표준 응답 `{ code, message, data | <resourceKey> }` 를 언랩하여 페이로드만 반환합니다.
  * `code !== 200` 인 경우 {@link BserApiError} throw.
@@ -99,7 +82,11 @@ export class HttpClient {
      * @param options - 클라이언트 옵션
      */
     constructor(options: BserClientOptions) {
-        this.ky = createKyInstance(options.apiKey, options.timeout ?? 10_000);
+        this.ky = ky.create({
+            baseUrl: BASE_URL + "/",
+            timeout: options.timeout ?? 10_000,
+            headers: {"x-api-key": options.apiKey}
+        });
     }
 
     /**
