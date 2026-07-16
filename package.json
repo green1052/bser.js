@@ -1,8 +1,8 @@
 {
 	"name": "@green1052/bser.js",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Eternal Return Open API client for Bun and Node.js",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"type": "module",
 	"main": "./dist/index.js",
 	"module": "./src/index.ts",

@@ -9,7 +9,7 @@
 - **런타임 의존성 최소** — HTTP 통신은 `ky` 하나뿐
 - **모든 메서드에 JSDoc** — 에디터를 떠나지 않고 IntelliSense 확인
 - **통합 테스트** — 실제 API 체인 테스트 (data → ranking → user → match)
-- **MIT 라이선스**
+- **GPL-3.0 라이선스**
 
 ## 빠른 시작
 
@@ -117,4 +117,4 @@ bun run typecheck  # tsc --noEmit
 
 ## 라이선스
 
-MIT
+GPL-3.0-only
