@@ -1,13 +1,13 @@
 /**
- * 클라이언트 에러 처리 테스트.
- * 잘못된 API 키로 BserApiError 발생 확인.
+ * Client error handling tests.
+ * Verifies BserApiError on invalid API key.
  */
 
 import {describe, expect, it, test} from "bun:test";
 import {BserApiError, BserClient} from "../src";
 import {hasApiKey} from "./helpers";
 
-test.skipIf(!hasApiKey)("잘못된 API 키로 BserApiError 발생", async () => {
+test.skipIf(!hasApiKey)("invalid API key throws BserApiError", async () => {
     const badClient = new BserClient({apiKey: "invalid-key-xxxx"});
     try {
         await badClient.data.getGameDataHash();
@@ -17,7 +17,7 @@ test.skipIf(!hasApiKey)("잘못된 API 키로 BserApiError 발생", async () => 
     }
 });
 
-test.skipIf(!hasApiKey)("BserApiError에 code와 message가 포함됨", async () => {
+test.skipIf(!hasApiKey)("BserApiError contains code and message", async () => {
     const badClient = new BserClient({apiKey: "invalid-key-xxxx"});
     try {
         await badClient.data.getGameDataHash();
@@ -32,7 +32,7 @@ test.skipIf(!hasApiKey)("BserApiError에 code와 message가 포함됨", async ()
 });
 
 describe("BserApiError", () => {
-    it("name이 BserApiError", () => {
+    it("name is BserApiError", () => {
         const err = new BserApiError(403, "forbidden");
         expect(err.name).toBe("BserApiError");
         expect(err.code).toBe(403);

@@ -1,13 +1,13 @@
 /**
- * 랭킹 API 통합 테스트.
- * 체인: getTop → nickname 추출 → getTopByServer(Asia)
+ * Ranking API integration tests.
+ * Chain: getTop → extract nickname → getTopByServer(Asia)
  */
 
 import {expect, test} from "bun:test";
 import {MatchingTeamMode, RegionServerCode} from "../src";
 import {client, hasApiKey, sharedState} from "./helpers.ts";
 
-test.skipIf(!hasApiKey)("getTop — 상위 랭커 반환", async () => {
+test.skipIf(!hasApiKey)("getTop — returns top rankers", async () => {
     const top = await client.ranking.getTop(sharedState.seasonId, MatchingTeamMode.Squad);
     expect(Array.isArray(top)).toBe(true);
     expect(top.length).toBeGreaterThan(0);
@@ -19,7 +19,7 @@ test.skipIf(!hasApiKey)("getTop — 상위 랭커 반환", async () => {
     expect(sharedState.nickname.length).toBeGreaterThan(0);
 });
 
-test.skipIf(!hasApiKey)("getTopByServer Asia — 아시아 서버 상위 랭커", async () => {
+test.skipIf(!hasApiKey)("getTopByServer Asia — Asia server top rankers", async () => {
     const top = await client.ranking.getTopByServer(
         sharedState.seasonId,
         MatchingTeamMode.Squad,
@@ -27,6 +27,6 @@ test.skipIf(!hasApiKey)("getTopByServer Asia — 아시아 서버 상위 랭커"
     );
     expect(Array.isArray(top)).toBe(true);
     expect(top.length).toBeGreaterThan(0);
-    // 반환된 랭커의 serverCode가 Asia여야 함
-    expect(top[0]?.serverCode).toBe(RegionServerCode.Asia);
+    // getTopByServer 응답에는 serverCode/serverRank가 없음 (API v11.0.0)
+    expect(top[0]?.nickname).toBeDefined();
 });

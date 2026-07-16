@@ -20,8 +20,8 @@ export const sharedState = {
     seasonId: 33,
     /** 닉네임 (ranking.test.ts에서 추출). */
     nickname: "",
-    /** 유저 UID (user.test.ts에서 추출). */
-    uid: 0,
+    /** 유저 ID (user.test.ts에서 추출). */
+    userId: "",
     /** 게임 ID (user.test.ts getGames에서 추출). */
     gameId: 0
 };

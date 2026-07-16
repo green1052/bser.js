@@ -11,7 +11,7 @@
  * const user = await client.user.getByNickname("닉네임");
  *
  * // 최근 게임 기록
- * const games = await client.user.getGames(user.uid);
+ * const games = await client.user.getGames(user.userId);
  *
  * // 랭커 조회
  * const top = await client.ranking.getTop(33, MatchingTeamMode.Squad);
@@ -23,7 +23,7 @@
  * @module
  */
 
-import ky, {type KyInstance, type Options as KyOptions} from "ky";
+import ky, {HTTPError, type KyInstance, type Options as KyOptions} from "ky";
 
 import type {BserApiResponse} from "./types.ts";
 import {DataModule} from "./modules/data.ts";
@@ -39,7 +39,7 @@ const BASE_URL = "https://open-api.bser.io";
 
 /**
  * Eternal Return Open API 호출 시 발생하는 에러.
- * `code !== 200` 응답을 받았을 때 throw 됩니다.
+ * `code !== 200` 응답이거나 HTTP 오류(403 Forbidden 등) 발생 시 throw 됩니다.
  */
 export class BserApiError extends Error {
     /** API 응답 코드 (400, 403, 404, 429, 500 등). */
@@ -77,7 +77,7 @@ export interface BserClientOptions {
 /**
  * API HTTP 클라이언트 래퍼.
  * 표준 응답 `{ code, message, data | <resourceKey> }` 를 언랩하여 페이로드만 반환합니다.
- * `code !== 200` 인 경우 {@link BserApiError} throw.
+ * `code !== 200` 이거나 HTTP 오류 발생 시 {@link BserApiError} throw.
  */
 export class HttpClient {
     /** ky 인스턴스. */
@@ -101,14 +101,22 @@ export class HttpClient {
      * @param path - API 경로 (`/v1/...` 또는 `/v2/...`, 선행 슬래시 없이)
      * @param searchParams - 쿼리 파라미터 (optional)
      * @returns 페이로드 (`data` 또는 리소스 키 값)
-     * @throws {BserApiError} `code !== 200` 인 경우
+     * @throws {BserApiError} `code !== 200` 이거나 HTTP 오류인 경우
      * @example
      * ```ts
      * const user = await client.request<User>("v1/user/nickname", { query: "닉네임" });
      * ```
      */
     async request<T>(path: string, searchParams?: Record<string, string | number>): Promise<T> {
-        const response = await this.ky.get(path, {searchParams}).json<BserApiResponse<T>>();
+        let response: BserApiResponse<T>;
+        try {
+            response = await this.ky.get(path, {searchParams}).json<BserApiResponse<T>>();
+        } catch (e) {
+            if (e instanceof HTTPError) {
+                throw new BserApiError(e.response.status, e.response.statusText);
+            }
+            throw e;
+        }
         if (response.code !== 200) {
             throw new BserApiError(response.code, response.message);
         }

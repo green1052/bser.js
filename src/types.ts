@@ -28,8 +28,8 @@ export interface BserApiResponse<T> {
 
 /** 닉네임 검색 결과. */
 export interface User {
-    /** 유저 고유 식별자(UID). 닉네임 변경 시 변경됩니다. */
-    uid: number;
+    /** 유저 고유 식별자(userId). 닉네임 변경 시 변경됩니다. */
+    userId: string;
     /** 유저 닉네임. */
     nickname: string;
 }
@@ -194,16 +194,20 @@ export interface UnionTeam {
 
 /** 상위 랭커 정보. */
 export interface TopRanker {
+    /** 유저 고유 식별자(userId). getTop 응답에만 존재. */
+    uid?: string;
     /** 유저 닉네임. */
     nickname: string;
     /** 매칭 MMR. */
     mmr: number;
     /** 랭크 순위. */
     rank: number;
-    /** 리전 서버 코드. {@link RegionServerCode} 참조. */
-    serverCode: number;
-    /** 서버 내 순위. */
-    serverRank: number;
+    /** 리전 서버 코드. {@link RegionServerCode} 참조. getTop 응답에만 존재. */
+    serverCode?: number;
+    /** 서버 내 순위. getTop 응답에만 존재. */
+    serverRank?: number;
+    /** 유저 엠블럼 배열. */
+    userEmblems?: unknown[];
 }
 
 // ──────────────────────────────────────────────
