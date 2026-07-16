@@ -17,7 +17,7 @@ jobs:
 
             -   run: bun run typecheck
 
-            -   run: bun test test/constants.test.ts
+            -   run: bun test
 
             -   run: bun run build
 

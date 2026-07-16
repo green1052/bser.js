@@ -18,7 +18,7 @@ bun install
 ```
 
 ```ts
-import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "@green1052/bser.js";
+import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "bser.js";
 
 const client = new BserClient({ apiKey: "your-api-key" });
 
@@ -38,9 +38,9 @@ const { l10Path } = await client.data.getLanguage(Language.Korean);
 ## 설치
 
 ```bash
-bun add @green1052/bser.js
+bun add bser.js
 # 또는
-npm install @green1052/bser.js
+npm install bser.js
 ```
 
 API 키는 <https://developer.eternalreturn.io> 에서 발급받으세요.
@@ -68,7 +68,7 @@ API 키는 <https://developer.eternalreturn.io> 에서 발급받으세요.
 모든 메서드는 API 응답 code가 200이 아닌 경우 `BserApiError` 를 throw 합니다:
 
 ```ts
-import { BserApiError } from "@green1052/bser.js";
+import { BserApiError } from "bser.js";
 
 try {
   const user = await client.user.getByNickname("존재하지_않는_닉네임");
