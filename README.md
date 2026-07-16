@@ -1,6 +1,6 @@
 # bser.js
 
-[이터널 리턴 Open API](https://developer.eternalreturn.io) 의 TypeScript 래퍼. Bun + ky 기반.
+[이터널 리턴 API](https://developer.eternalreturn.io) 래퍼
 
 ## 빠른 시작
 
