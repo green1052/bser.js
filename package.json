@@ -24,9 +24,6 @@
 		"typecheck": "tsc --noEmit",
 		"test": "bun test"
 	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com"
-	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/green1052/bser.js.git"

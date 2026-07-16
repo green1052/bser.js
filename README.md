@@ -45,31 +45,6 @@ const { l10Path } = await client.data.getLanguage(Language.Korean);
 
 ## Installation
 
-This package is published to **GitHub Packages**, not the npm registry. Configure your project to resolve `@green1052` scope from GitHub Packages:
-
-**Step 1** — Create or edit `.npmrc` in your project root:
-
-```ini
-@green1052:registry=https://npm.pkg.github.com
-```
-
-**Step 2** — Authenticate with a [Personal Access Token](https://github.com/settings/tokens) (needs `read:packages` scope). For Node.js / npm:
-
-```bash
-npm login --scope=@green1052 --registry=https://npm.pkg.github.com
-# Username: your-github-username
-# Password: your-pat-with-read-packages-scope
-# Email: your-email@example.com
-```
-
-For Bun, set the token via environment variable instead:
-
-```bash
-export BUN_CONFIG_TOKEN=your-pat-with-read-packages-scope
-```
-
-**Step 3** — Install:
-
 ```bash
 bun add @green1052/bser.js
 # or
@@ -194,31 +169,6 @@ const { l10Path } = await client.data.getLanguage(Language.Korean);
 ```
 
 ## 설치
-
-이 패키지는 **GitHub Packages** 에 배포됩니다 (npm 레지스트리가 아님). `@green1052` 스코프를 GitHub Packages에서 해석하도록 설정하세요:
-
-**1단계** — 프로젝트 루트에 `.npmrc` 파일을 생성하거나 수정합니다:
-
-```ini
-@green1052:registry=https://npm.pkg.github.com
-```
-
-**2단계** — [Personal Access Token](https://github.com/settings/tokens) 으로 인증합니다 (`read:packages` 권한 필요). Node.js / npm의 경우:
-
-```bash
-npm login --scope=@green1052 --registry=https://npm.pkg.github.com
-# Username: 본인 GitHub 사용자명
-# Password: read:packages 권한이 있는 PAT
-# Email: 본인 이메일
-```
-
-Bun의 경우 환경변수로 토큰을 설정합니다:
-
-```bash
-export BUN_CONFIG_TOKEN=read:packages-권한이-있는-PAT
-```
-
-**3단계** — 설치:
 
 ```bash
 bun add @green1052/bser.js
