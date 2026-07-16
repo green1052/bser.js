@@ -1,312 +1,350 @@
-# API reference
+# API 레퍼런스
 
 ## BserClient
 
-Main entry point. Creates an HTTP client and exposes four modules.
+Eternal Return Open API 클라이언트. 모든 API 엔드포인트에 대한 접근을 제공합니다.
 
-### Constructor
+### 생성자
 
 ```ts
 new BserClient(options: BserClientOptions)
 ```
 
-| Option | Type | Required | Default | Description |
-| ------ | ---- | -------- | ------- | ----------- |
-| `apiKey` | `string` | Yes | - | API key from developer.eternalreturn.io |
-| `timeout` | `number` | No | `10000` | Request timeout in ms |
-
-### Properties
-
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| `client.data` | `DataModule` | Game data, L10N, weapon routes |
-| `client.ranking` | `RankingModule` | Top rankers |
-| `client.user` | `UserModule` | User search, games, rank, stats, union team |
-| `client.match` | `MatchModule` | Match results by game ID |
-| `client.http` | `HttpClient` | Low-level HTTP client (advanced) |
-
-### Example
+| 옵션 | 타입 | 필수 | 기본값 | 설명 |
+| ---- | ---- | ---- | ------ | ---- |
+| `apiKey` | `string` | 예 | - | API 키. [developer.eternalreturn.io](https://developer.eternalreturn.io) 에서 발급. |
+| `timeout` | `number` | 아니오 | `10000` | 요청 타임아웃 (ms). |
+| `ky` | `Omit<KyOptions, "baseUrl" \| "headers">` | 아니오 | - | ky에 전달할 추가 옵션 (`retry`, `hooks`, `fetch` 등). `baseUrl`과 `headers`는 내부에서 고정. |
 
 ```ts
 import { BserClient } from "bser.js";
-const client = new BserClient({ apiKey: "your-key" });
+
+const client = new BserClient({ apiKey: "your-api-key" });
+
+// 재시도 설정
+const client2 = new BserClient({
+  apiKey: "key",
+  ky: { retry: { limit: 5 } }
+});
 ```
+
+### 프로퍼티
+
+| 프로퍼티 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `client.data` | `DataModule` | 데이터 API (게임 데이터, L10N, 추천 무기 루트) |
+| `client.ranking` | `RankingModule` | 랭킹 API (상위 랭커 조회) |
+| `client.user` | `UserModule` | 유저 API (닉네임 검색, 게임 기록, 랭크, 스탯, 유니온 팀) |
+| `client.match` | `MatchModule` | 매치 API (게임 ID로 매치 조회) |
+| `client.http` | `HttpClient` | HTTP 클라이언트 (고급 사용자용) |
 
 ---
 
-## DataModule (`client.data`)
+## DataModule
 
-### `getGameDataHash()`
+`client.data` — 게임 데이터, L10N, 추천 무기 루트.
 
-Returns hash codes for all game data tables. Use to detect table updates.
+### getGameDataHash()
+
+모든 게임 데이터 테이블의 해시코드를 조회합니다. 해시코드가 변경되면 해당 테이블이 업데이트되었음을 의미합니다.
+
+```ts
+async getGameDataHash(): Promise<Record<string, number>>
+```
+
+**엔드포인트**: `GET /v2/data/hash`
 
 ```ts
 const hashes = await client.data.getGameDataHash();
-// hashes["Character"] → 1234567890
+console.log(hashes["Character"]); // 예: 1234567890
 ```
 
-**Returns:** `Promise<Record<string, number>>` — table name → hash code
+### getGameData(metaType)
 
----
-
-### `getGameData<T>(metaType)`
-
-Fetches a game data table by meta type.
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `metaType` | `MetaType` | Yes | Table name: `"Character"`, `"Season"`, `"ItemWeapon"`, `"Monster"`, `"hash"`, etc. |
+특정 메타 타입의 게임 데이터를 조회합니다.
 
 ```ts
-interface CharacterRow { code: number; name: string; }
-const characters = await client.data.getGameData<CharacterRow>("Character");
+async getGameData<T = Record<string, unknown>>(metaType: MetaType): Promise<T[]>
 ```
 
-**Returns:** `Promise<T[]>` — array of rows (generic, default `Record<string, unknown>`)
+**엔드포인트**: `GET /v2/data/{metaType}`
 
-Notable meta types: `Character`, `CharacterLevelUpStat`, `CharacterMastery`, `CharacterModeModifier`, `WeaponTypeInfo`, `ItemSkillLinker`, `ItemSpawn`, `ItemWeapon`, `ItemArmor`, `ItemSpecial`, `ItemConsumable`, `Monster`, `MonsterLevelUpStat`, `MonsterDropGroup`, `DropGroup`, `VFCredit`, `Season`.
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `metaType` | `MetaType` | 메타 타입. `"Character"`, `"Season"`, `"ItemWeapon"` 등. |
 
----
+```ts
+const seasons = await client.data.getGameData<{ seasonId: number; seasonName: string }>("Season");
+const characters = await client.data.getGameData("Character");
+```
 
-### `getLanguage(language)`
+### getLanguage(language)
 
-Gets the L10N download URL. The returned `l10Path` is a text file URL; file content uses `┃` separator with `key┃value` per line.
+언어 데이터(L10N) 다운로드 경로를 조회합니다. 반환된 `l10Path`는 텍스트 파일 URL이며, 파일 내용은 `┃` 구분자로 `key┃value` 형식입니다.
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `language` | `string` | Yes | Language code. Use `Language` enum. |
+```ts
+async getLanguage(language: string): Promise<LanguageData>
+```
+
+**엔드포인트**: `GET /v1/l10n/{language}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `language` | `string` | 언어 코드. {@link Language} 참조. |
 
 ```ts
 const { l10Path } = await client.data.getLanguage(Language.Korean);
 const text = await fetch(l10Path).then(r => r.text());
-const dict = Object.fromEntries(text.trim().split("\n").map(l => l.split("┃")));
-// dict["Monster/Name/1"] → "닭"
 ```
 
-**Returns:** `Promise<LanguageData>` — `{ l10Path: string }`
+### getWeaponRoutes(routeId?)
 
----
+추천 무기 루트 목록을 조회합니다.
 
-### `getWeaponRoutes(routeId?)`
+```ts
+async getWeaponRoutes(routeId?: number): Promise<RecommendWeaponRoute[]>
+```
 
-Gets recommended weapon routes.
+**엔드포인트**: `GET /v1/weaponRoutes/recommend`
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `routeId` | `number` | No | Specific route ID. Omit for all routes. |
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `routeId` | `number?` | 특정 루트 ID. 생략 시 전체 목록. |
 
 ```ts
 const routes = await client.data.getWeaponRoutes();
 const specific = await client.data.getWeaponRoutes(123);
 ```
 
-**Returns:** `Promise<RecommendWeaponRoute[]>`
+### getWeaponRouteDesc(routeId)
 
----
+추천 무기 루트의 설명을 조회합니다.
 
-### `getWeaponRouteDesc(routeId)`
+```ts
+async getWeaponRouteDesc(routeId: number): Promise<RecommendWeaponRouteDesc[]>
+```
 
-Gets descriptions for a recommended weapon route.
+**엔드포인트**: `GET /v1/weaponRoutes/recommend`
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `routeId` | `number` | Yes | Route ID |
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `routeId` | `number` | 루트 ID. |
 
 ```ts
 const descs = await client.data.getWeaponRouteDesc(123);
 ```
 
-**Returns:** `Promise<RecommendWeaponRouteDesc[]>`
-
 ---
 
-## RankingModule (`client.ranking`)
+## RankingModule
 
-### `getTop(seasonId, matchingTeamMode)`
+`client.ranking` — 상위 랭커 조회.
 
-Gets top rankers. Ranked matches only, squad mode only.
+### getTop(seasonId, matchingTeamMode)
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `seasonId` | `number` | Yes | Season ID |
-| `matchingTeamMode` | `number` | Yes | Team mode. `MatchingTeamMode.Squad` (3) only. |
+전체 상위 랭커를 조회합니다. 랭크 매치만 해당하며, 스쿼드 모드만 지원합니다.
+
+```ts
+async getTop(seasonId: number, matchingTeamMode: number): Promise<TopRanker[]>
+```
+
+**엔드포인트**: `GET /v1/rank/top/{seasonId}/{matchingTeamMode}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `seasonId` | `number` | 시즌 ID. |
+| `matchingTeamMode` | `number` | 매칭 팀 모드. {@link MatchingTeamMode} 참조. (3=스쿼드만 지원) |
 
 ```ts
 const top = await client.ranking.getTop(33, MatchingTeamMode.Squad);
-console.log(top[0].nickname); // #1 nickname
+console.log(top[0].nickname); // 1위 닉네임
 ```
 
-**Returns:** `Promise<TopRanker[]>`
+### getTopByServer(seasonId, matchingTeamMode, serverCode)
 
----
+특정 리전 서버의 상위 랭커를 조회합니다.
 
-### `getTopByServer(seasonId, matchingTeamMode, serverCode)`
+```ts
+async getTopByServer(seasonId: number, matchingTeamMode: number, serverCode: number): Promise<TopRanker[]>
+```
 
-Gets top rankers for a specific region server.
+**엔드포인트**: `GET /v1/rank/top/{seasonId}/{matchingTeamMode}/{serverCode}`
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `seasonId` | `number` | Yes | Season ID |
-| `matchingTeamMode` | `number` | Yes | Team mode. `MatchingTeamMode.Squad` (3) only. |
-| `serverCode` | `number` | Yes | Region server code. Use `RegionServerCode` enum. |
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `seasonId` | `number` | 시즌 ID. |
+| `matchingTeamMode` | `number` | 매칭 팀 모드. (3=스쿼드만 지원) |
+| `serverCode` | `number` | 리전 서버 코드. {@link RegionServerCode} 참조. |
 
 ```ts
 const asiaTop = await client.ranking.getTopByServer(33, MatchingTeamMode.Squad, RegionServerCode.Asia);
 ```
 
-**Returns:** `Promise<TopRanker[]>`
+> **참고**: `getTopByServer` 응답에는 `serverCode`/`serverRank`가 포함되지 않습니다 (API v11.0.0).
 
 ---
 
-## UserModule (`client.user`)
+## UserModule
 
-### `getByNickname(nickname)`
+`client.user` — 닉네임 검색, 게임 기록, 랭크, 스탯, 유니온 팀.
 
-Searches a user by nickname. The returned `uid` is temporary and changes on rename.
+### getByNickname(nickname)
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `nickname` | `string` | Yes | Nickname to search |
+닉네임으로 유저를 검색합니다. 반환된 `userId`는 닉네임 변경 시 변경되는 임시 식별자입니다.
 
 ```ts
-const { uid, nickname } = await client.user.getByNickname("닉네임");
+async getByNickname(nickname: string): Promise<User>
 ```
 
-**Returns:** `Promise<User>` — `{ uid: number, nickname: string }`
+**엔드포인트**: `GET /v1/user/nickname?query={nickname}`
 
-**Throws:** `BserApiError` (code 404) if not found
-
----
-
-### `getGames(uid)`
-
-Gets a user's recent game records. Max 90 days; games before a rename are excluded.
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `uid` | `number` | Yes | User UID (from `getByNickname`) |
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `nickname` | `string` | 검색할 닉네임. |
 
 ```ts
-const games = await client.user.getGames(uid);
+const { userId } = await client.user.getByNickname("닉네임");
+```
+
+### getGames(userId)
+
+유저의 최근 게임 기록을 조회합니다. 최대 90일치 데이터이며, 닉네임 변경 이전의 게임은 제외됩니다.
+
+```ts
+async getGames(userId: string): Promise<BattleUserResult[]>
+```
+
+**엔드포인트**: `GET /v1/user/games/uid/{userId}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `userId` | `string` | 유저 ID. `getByNickname`으로 획득. |
+
+```ts
+const games = await client.user.getGames(userId);
 console.log(games[0].gameId);
 ```
 
-**Returns:** `Promise<BattleUserResult[]>`
+### getRank(userId, seasonId, matchingTeamMode)
 
----
-
-### `getRank(userId, seasonId, matchingTeamMode)`
-
-Gets a user's rank info.
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `userId` | `number` | Yes | User ID (UID) |
-| `seasonId` | `number` | Yes | Season ID |
-| `matchingTeamMode` | `number` | Yes | Team mode. `MatchingTeamMode.Squad` (3) only. |
+유저의 랭크 정보를 조회합니다.
 
 ```ts
-const rank = await client.user.getRank(uid, 33, MatchingTeamMode.Squad);
+async getRank(userId: string, seasonId: number, matchingTeamMode: number): Promise<UserRank>
 ```
 
-**Returns:** `Promise<UserRank>`
+**엔드포인트**: `GET /v1/rank/uid/{userId}/{seasonId}/{matchingTeamMode}`
 
----
-
-### `getStats(userId, seasonId, matchingMode)`
-
-Gets a user's season/mode stats.
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `userId` | `number` | Yes | User ID (UID) |
-| `seasonId` | `number` | Yes | Season ID. `0` = normal (non-ranked). |
-| `matchingMode` | `number` | Yes | Matching mode. `MatchingMode.SquadNormal` (2) or `MatchingMode.SquadRanked` (3). |
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `userId` | `string` | 유저 ID. |
+| `seasonId` | `number` | 시즌 ID. |
+| `matchingTeamMode` | `number` | 매칭 팀 모드. (3=스쿼드만 지원) |
 
 ```ts
-const normalStats = await client.user.getStats(uid, 0, MatchingMode.SquadNormal);
-const rankedStats = await client.user.getStats(uid, 33, MatchingMode.SquadRanked);
+const rank = await client.user.getRank(userId, 33, MatchingTeamMode.Squad);
 ```
 
-**Returns:** `Promise<UserStats[]>`
+### getStats(userId, seasonId, matchingMode)
 
----
-
-### `getUnionTeam(userId, seasonId)`
-
-Gets a user's union team info.
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `userId` | `number` | Yes | User ID (UID) |
-| `seasonId` | `number` | Yes | Season ID |
+유저의 시즌/모드별 스탯을 조회합니다.
 
 ```ts
-const teams = await client.user.getUnionTeam(uid, 33);
+async getStats(userId: string, seasonId: number, matchingMode: number): Promise<UserStats[]>
 ```
 
-**Returns:** `Promise<UnionTeam[]>`
+**엔드포인트**: `GET /v2/user/stats/uid/{userId}/{seasonId}/{matchingMode}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `userId` | `string` | 유저 ID. |
+| `seasonId` | `number` | 시즌 ID. `0` = 일반(normal). |
+| `matchingMode` | `number` | 매칭 모드. {@link MatchingMode} 참조. (2=일반, 3=랭크) |
+
+```ts
+const normalStats = await client.user.getStats(userId, 0, MatchingMode.SquadNormal);
+const rankedStats = await client.user.getStats(userId, 33, MatchingMode.SquadRanked);
+```
+
+### getUnionTeam(userId, seasonId)
+
+유저의 유니온 팀 정보를 조회합니다.
+
+```ts
+async getUnionTeam(userId: string, seasonId: number): Promise<UnionTeam[]>
+```
+
+**엔드포인트**: `GET /v1/unionTeam/uid/{userId}/{seasonId}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `userId` | `string` | 유저 ID. |
+| `seasonId` | `number` | 시즌 ID. |
+
+```ts
+const teams = await client.user.getUnionTeam(userId, 33);
+```
 
 ---
 
-## MatchModule (`client.match`)
+## MatchModule
 
-### `getById(gameId)`
+`client.match` — 게임 ID로 매치 조회.
 
-Gets all players' battle results for a specific match.
+### getById(gameId)
 
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `gameId` | `number` | Yes | Game ID |
+특정 게임(매치)의 모든 플레이어 전투 결과를 조회합니다.
+
+```ts
+async getById(gameId: number): Promise<BattleUserResult[]>
+```
+
+**엔드포인트**: `GET /v1/games/{gameId}`
+
+| 파라미터 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `gameId` | `number` | 게임 ID. `getGames`로 획득. |
 
 ```ts
 const results = await client.match.getById(gameId);
-console.log(results.length); // player count
+console.log(results.length); // 참여 플레이어 수
 ```
-
-**Returns:** `Promise<BattleUserResult[]>`
-
-**Throws:** `BserApiError` (code 404) if game not found
 
 ---
 
-## BserApiError
+## 에러 처리
 
-Thrown when API returns `code !== 200`.
+모든 메서드는 API 응답 `code`가 200이 아닌 경우, 또는 HTTP 오류(403 Forbidden 등) 발생 시 `BserApiError`를 throw 합니다.
 
 ```ts
-class BserApiError extends Error {
-  readonly code: number;       // API response code (400, 403, 404, 429, 500)
-  readonly apiMessage: string; // API response message
+import { BserApiError } from "bser.js";
+
+try {
+  const user = await client.user.getByNickname("존재하지_않는_닉네임");
+} catch (e) {
+  if (e instanceof BserApiError) {
+    console.log(e.code);       // 404
+    console.log(e.apiMessage); // "..."
+  }
 }
 ```
 
-| Code | Meaning |
-| ---- | ------- |
-| 200 | Success |
-| 400 | Bad parameters |
-| 403 | Forbidden / rate limit |
-| 404 | Not found |
-| 429 | Too many requests |
-| 500 | Server error |
+### BserApiError
 
----
+| 프로퍼티 | 타입 | 설명 |
+| -------- | ---- | ---- |
+| `code` | `number` | API 응답 코드 (400, 403, 404, 429, 500 등) |
+| `apiMessage` | `string` | API 응답 메시지 |
+| `name` | `string` | `"BserApiError"` |
+| `message` | `string` | `BSER API error {code}: {message}` |
 
-## HttpClient (advanced)
+### 에러 코드
 
-Low-level wrapper. Exposed as `client.http` for custom requests.
-
-### `request<T>(path, searchParams?)`
-
-```ts
-const user = await client.http.request<User>("v1/user/nickname", { query: "닉네임" });
-```
-
-| Parameter | Type | Required | Description |
-| --------- | ---- | -------- | ----------- |
-| `path` | `string` | Yes | API path without leading slash (e.g. `"v1/user/nickname"`) |
-| `searchParams` | `Record<string, string \| number>` | No | Query parameters |
-
-**Returns:** `Promise<T>` — unwrapped payload (extracts first key after `code`/`message`)
-
-**Throws:** `BserApiError` when `code !== 200`
+| Code | 의미 |
+| ---- | ---- |
+| 200 | 성공 |
+| 400 | 파라미터 오류 |
+| 403 | 금지 / 레이트 리밋 |
+| 404 | 찾을 수 없음 |
+| 429 | 요청 과다 |
+| 500 | 서버 오류 |
