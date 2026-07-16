@@ -21,9 +21,8 @@ jobs:
 
             -   run: bun test
 
-            -   uses: actions/setup-node@v6
+            -   uses: actions/setup-node@v7
                 with:
-                    node-version: '24'
-                    registry-url: 'https://registry.npmjs.org'
+                    node-version: 'latest'
 
             -   run: npm publish --access public
