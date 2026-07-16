@@ -11,7 +11,6 @@ test.skipIf(!hasApiKey)("getGameDataHash — returns hash table", async () => {
     const hash = await client.data.getGameDataHash();
     expect(typeof hash).toBe("object");
     expect(hash).not.toBeNull();
-    // Character 같은 주요 키가 있어야 함
     expect("Character" in hash).toBe(true);
 });
 
@@ -25,7 +24,6 @@ test.skipIf(!hasApiKey)("getGameData Season — extract seasonId", async () => {
     const seasons = await client.data.getGameData<{ seasonId: number; seasonName: string }>("Season");
     expect(Array.isArray(seasons)).toBe(true);
     expect(seasons.length).toBeGreaterThan(0);
-    // 가장 최근 시즌 ID를 sharedState에 저장
     const latest = seasons.reduce((a, b) => ((a.seasonId ?? 0) > (b.seasonId ?? 0) ? a : b));
     if (latest.seasonId) {
         sharedState.seasonId = latest.seasonId;

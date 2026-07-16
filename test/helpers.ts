@@ -1,27 +1,27 @@
 /**
- * 테스트 헬퍼 — 공통 상태 및 클라이언트 인스턴스.
+ * Test helpers — shared state and client instance.
  * @module
  */
 
 import {BserClient} from "../src";
 
-/** API 키 (환경 변수에서 로드). 없으면 모든 통합 테스트 skip. */
+/** API key (loaded from env). If empty, all integration tests are skipped. */
 const apiKey = process.env.BSER_API_KEY ?? "";
 
-/** 통합 테스트 skip 여부. */
+/** Whether integration tests should run. */
 export const hasApiKey = apiKey !== "";
 
-/** 공유 클라이언트 인스턴스. */
+/** Shared client instance. */
 export const client = new BserClient({apiKey});
 
-/** 통합 테스트 체인에서 공유되는 상태. */
+/** Shared state across the integration test chain. */
 export const sharedState = {
-    /** 시즌 ID (data.test.ts에서 추출, fallback 33). */
+    /** Season ID (extracted in data.test.ts, fallback 33). */
     seasonId: 33,
-    /** 닉네임 (ranking.test.ts에서 추출). */
+    /** Nickname (extracted in ranking.test.ts). */
     nickname: "",
-    /** 유저 ID (user.test.ts에서 추출). */
+    /** User ID (extracted in user.test.ts). */
     userId: "",
-    /** 게임 ID (user.test.ts getGames에서 추출). */
+    /** Game ID (extracted in user.test.ts getGames). */
     gameId: 0
 };

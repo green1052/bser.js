@@ -11,7 +11,6 @@ test.skipIf(!hasApiKey)("getTop — returns top rankers", async () => {
     const top = await client.ranking.getTop(sharedState.seasonId, MatchingTeamMode.Squad);
     expect(Array.isArray(top)).toBe(true);
     expect(top.length).toBeGreaterThan(0);
-    // 상위 랭커에서 닉네임 추출하여 sharedState에 저장
     if (top[0]?.nickname) {
         sharedState.nickname = top[0].nickname;
     }
@@ -27,6 +26,5 @@ test.skipIf(!hasApiKey)("getTopByServer Asia — Asia server top rankers", async
     );
     expect(Array.isArray(top)).toBe(true);
     expect(top.length).toBeGreaterThan(0);
-    // getTopByServer 응답에는 serverCode/serverRank가 없음 (API v11.0.0)
     expect(top[0]?.nickname).toBeDefined();
 });
