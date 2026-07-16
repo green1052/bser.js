@@ -1,5 +1,5 @@
 {
-	"name": "bser.js",
+	"name": "@green1052/bser.js",
 	"version": "0.1.0",
 	"description": "Eternal Return Open API client for Bun and Node.js",
 	"license": "MIT",
@@ -20,10 +20,16 @@
 	],
 	"scripts": {
 		"build": "bun run build.ts",
-		"prepare": "bun run build",
 		"prepublishOnly": "bun run build",
 		"typecheck": "tsc --noEmit",
 		"test": "bun test"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/green1052/bser.js.git"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.3.14",
