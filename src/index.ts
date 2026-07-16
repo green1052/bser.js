@@ -3,8 +3,7 @@
  * @module
  */
 
-export {BserClient} from "./bser-client.ts";
-export {BserApiError, type BserClientOptions} from "./client.ts";
+export {BserApiError, BserClient, type BserClientOptions} from "./client.ts";
 export type {
     BattleUserResult,
     CharacterStat,
