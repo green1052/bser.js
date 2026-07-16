@@ -23,6 +23,5 @@ jobs:
             -   run: bun run build
 
             -   run: bun publish --access public
-                if: startsWith(github.ref, 'refs/tags/')
                 env:
                     NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
