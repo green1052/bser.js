@@ -4,11 +4,7 @@ await Bun.build({
     entrypoints: ["src/index.ts"],
     outdir: "dist",
     target: "node",
-    format: "esm",
-    splitting: false,
+    packages: "external",
     minify: false,
-    external: ["ky"],
     plugins: [dts()]
 });
-
-console.log("Build complete → dist/");
