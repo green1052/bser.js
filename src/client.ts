@@ -23,7 +23,7 @@
  * @module
  */
 
-import ky, {type KyInstance} from "ky";
+import ky, {type KyInstance, type Options as KyOptions} from "ky";
 
 import type {BserApiResponse} from "./types.ts";
 import {DataModule} from "./modules/data.ts";
@@ -67,6 +67,11 @@ export interface BserClientOptions {
     apiKey: string;
     /** 타임아웃 (ms). 기본값 10_000. */
     timeout?: number;
+    /**
+     * ky에 전달할 추가 옵션.
+     * `baseUrl`과 `headers`(`x-api-key`)는 내부에서 고정하므로 덮어쓸 수 없습니다.
+     */
+    ky?: Omit<KyOptions, "baseUrl" | "headers">;
 }
 
 /**
@@ -83,6 +88,7 @@ export class HttpClient {
      */
     constructor(options: BserClientOptions) {
         this.ky = ky.create({
+            ...options.ky,
             baseUrl: BASE_URL + "/",
             timeout: options.timeout ?? 10_000,
             headers: {"x-api-key": options.apiKey}
@@ -137,9 +143,12 @@ export class BserClient {
      * @param options - 클라이언트 옵션
      * @param options.apiKey - API 키. https://developer.eternalreturn.io 에서 발급.
      * @param options.timeout - 타임아웃 (ms). 기본값 10_000.
+     * @param options.ky - ky에 전달할 추가 옵션 (`retry`, `hooks`, `fetch` 등).
      * @example
      * ```ts
      * const client = new BserClient({ apiKey: "your-api-key" });
+     * // 재시도 설정
+     * const client = new BserClient({ apiKey: "key", ky: { retry: { limit: 5 } } });
      * ```
      */
     constructor(options: BserClientOptions) {

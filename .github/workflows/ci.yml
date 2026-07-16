@@ -1,46 +1,46 @@
 name: CI
 
 on:
-  push:
-    branches: [ master ]
-    tags: [ "*.*.*" ]
+    push:
+        branches: [ master ]
+        tags: [ "*.*.*" ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+            -   uses: oven-sh/setup-bun@v2
 
-      - run: bun install
+            -   run: bun install
 
-      - run: bun run typecheck
+            -   run: bun run typecheck
 
-      - run: bun test test/constants.test.ts
+            -   run: bun test test/constants.test.ts
 
-      - run: bun run build
+            -   run: bun run build
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
+            -   uses: actions/upload-artifact@v4
+                with:
+                    name: dist
+                    path: dist/
 
-  publish:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
+    publish:
+        needs: build
+        if: startsWith(github.ref, 'refs/tags/')
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            -   uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v2
+            -   uses: oven-sh/setup-bun@v2
 
-      - run: bun install
+            -   run: bun install
 
-      - run: bun run build
+            -   run: bun run build
 
-      - run: bun publish --access public
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
+            -   run: bun publish --access public
+                env:
+                    NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
