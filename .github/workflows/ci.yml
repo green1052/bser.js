@@ -23,7 +23,6 @@ jobs:
             -   run: bun run build
 
             -   run: |
-                    echo "//registry.npmjs.org/:_authToken=${NPM_CONFIG_TOKEN}" > .npmrc
-                    bun publish --access public
+                    npm publish --access public
                 env:
                     NPM_CONFIG_TOKEN: ${{ secrets.NPM_CONFIG_TOKEN }}
