@@ -16,7 +16,6 @@
 		"src"
 	],
 	"scripts": {
-		"typecheck": "tsc --noEmit",
 		"build": "bun run build.ts",
 		"prepublishOnly": "bun run build",
 		"test": "bun test"
