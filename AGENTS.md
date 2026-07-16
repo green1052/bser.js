@@ -36,7 +36,7 @@ There is no lint or format command configured.
 ## CI / Publish
 
 - `.github/workflows/ci.yml` triggers ONLY on tag push matching `*.*.*` (no branch triggers).
-- Publish step writes `.npmrc` from `NPM_CONFIG_TOKEN` env secret, then runs `bun publish --access public`. `bun publish` does not read the env var directly — the `.npmrc` file is required.
+- Publish step writes `.npmrc` (in project root, not `~/.npmrc`) from `NPM_CONFIG_TOKEN` env secret, then runs `bun publish --access public`. `bun publish` does not read the env var directly — the `.npmrc` file is required.
 - Secret name is `NPM_CONFIG_TOKEN` (not `NPM_TOKEN`).
 - Release: `git tag 1.0.0 && git push --tags` (no `v` prefix).
 
