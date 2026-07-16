@@ -10,6 +10,15 @@
 
 A TypeScript wrapper for the [Eternal Return Open API](https://developer.eternalreturn.io). Built with Bun + ky.
 
+## Features
+
+- **Full type safety** — all 11 endpoints and 284+ response fields typed
+- **Bun-native, Node.js compatible** — ships ESM + d.ts; works in Bun, Node.js 18+, and bundlers
+- **Zero runtime dependencies** — only `ky` for HTTP
+- **JSDoc on every method** — inline IntelliSense without leaving your editor
+- **Integration-tested** — real API test chain (data → ranking → user → match)
+- **MIT licensed**
+
 ## Quick start
 
 ```bash
@@ -17,7 +26,7 @@ bun install
 ```
 
 ```ts
-import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "bser.js";
+import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "@green1052/bser.js";
 
 const client = new BserClient({ apiKey: "your-api-key" });
 
@@ -36,10 +45,35 @@ const { l10Path } = await client.data.getLanguage(Language.Korean);
 
 ## Installation
 
+This package is published to **GitHub Packages**, not the npm registry. Configure your project to resolve `@green1052` scope from GitHub Packages:
+
+**Step 1** — Create or edit `.npmrc` in your project root:
+
+```ini
+@green1052:registry=https://npm.pkg.github.com
+```
+
+**Step 2** — Authenticate with a [Personal Access Token](https://github.com/settings/tokens) (needs `read:packages` scope). For Node.js / npm:
+
 ```bash
-bun add bser.js
+npm login --scope=@green1052 --registry=https://npm.pkg.github.com
+# Username: your-github-username
+# Password: your-pat-with-read-packages-scope
+# Email: your-email@example.com
+```
+
+For Bun, set the token via environment variable instead:
+
+```bash
+export BUN_CONFIG_TOKEN=your-pat-with-read-packages-scope
+```
+
+**Step 3** — Install:
+
+```bash
+bun add @green1052/bser.js
 # or
-npm install bser.js
+npm install @green1052/bser.js
 ```
 
 Get an API key from <https://developer.eternalreturn.io>.
@@ -100,11 +134,23 @@ BSER_API_KEY=your-key bun test
 
 Integration tests make real API requests in chain order: data → ranking → user → match.
 
+## Building from source
+
+```bash
+bun install
+bun run build      # outputs dist/ (index.js + index.d.ts)
+bun run typecheck  # tsc --noEmit
+```
+
 ## Documentation
 
 - [API reference](./docs/api.md)
 - [Types](./docs/types.md)
 - [Constants](./docs/constants.md)
+
+## License
+
+MIT
 
 ---
 
@@ -114,6 +160,15 @@ Integration tests make real API requests in chain order: data → ranking → us
 
 [이터널 리턴 Open API](https://developer.eternalreturn.io) 의 TypeScript 래퍼. Bun + ky 기반.
 
+## 특징
+
+- **완전한 타입 안전성** — 11개 엔드포인트, 284+ 응답 필드 모두 타입 정의
+- **Bun 네이티브, Node.js 호환** — ESM + d.ts 제공; Bun, Node.js 18+, 번들러 모두 지원
+- **런타임 의존성 최소** — HTTP 통신은 `ky` 하나뿐
+- **모든 메서드에 JSDoc** — 에디터를 떠나지 않고 IntelliSense 확인
+- **통합 테스트** — 실제 API 체인 테스트 (data → ranking → user → match)
+- **MIT 라이선스**
+
 ## 빠른 시작
 
 ```bash
@@ -121,7 +176,7 @@ bun install
 ```
 
 ```ts
-import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "bser.js";
+import { BserClient, Language, MatchingMode, MatchingTeamMode, RegionServerCode } from "@green1052/bser.js";
 
 const client = new BserClient({ apiKey: "your-api-key" });
 
@@ -140,10 +195,35 @@ const { l10Path } = await client.data.getLanguage(Language.Korean);
 
 ## 설치
 
+이 패키지는 **GitHub Packages** 에 배포됩니다 (npm 레지스트리가 아님). `@green1052` 스코프를 GitHub Packages에서 해석하도록 설정하세요:
+
+**1단계** — 프로젝트 루트에 `.npmrc` 파일을 생성하거나 수정합니다:
+
+```ini
+@green1052:registry=https://npm.pkg.github.com
+```
+
+**2단계** — [Personal Access Token](https://github.com/settings/tokens) 으로 인증합니다 (`read:packages` 권한 필요). Node.js / npm의 경우:
+
 ```bash
-bun add bser.js
+npm login --scope=@green1052 --registry=https://npm.pkg.github.com
+# Username: 본인 GitHub 사용자명
+# Password: read:packages 권한이 있는 PAT
+# Email: 본인 이메일
+```
+
+Bun의 경우 환경변수로 토큰을 설정합니다:
+
+```bash
+export BUN_CONFIG_TOKEN=read:packages-권한이-있는-PAT
+```
+
+**3단계** — 설치:
+
+```bash
+bun add @green1052/bser.js
 # 또는
-npm install bser.js
+npm install @green1052/bser.js
 ```
 
 API 키는 <https://developer.eternalreturn.io> 에서 발급받으세요.
@@ -204,8 +284,20 @@ BSER_API_KEY=your-key bun test
 
 통합 테스트는 실제 API 요청을 보내며, data → ranking → user → match 순서로 체인 실행됩니다.
 
+## 소스에서 빌드
+
+```bash
+bun install
+bun run build      # dist/ 생성 (index.js + index.d.ts)
+bun run typecheck  # tsc --noEmit
+```
+
 ## 문서
 
 - [API 레퍼런스](./docs/api.md)
 - [타입](./docs/types.md)
 - [상수](./docs/constants.md)
+
+## 라이선스
+
+MIT
