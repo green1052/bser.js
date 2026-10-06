@@ -23,7 +23,7 @@
 	"repository": "github:green1052/bser.js",
 	"devDependencies": {
 		"@types/bun": "^1.4.2",
-		"bun-plugin-dtsx": "^0.11.17"
+		"bun-plugin-dtsx": "^0.11.19"
 	},
 	"dependencies": {
 		"ky": "^2.1.0"
